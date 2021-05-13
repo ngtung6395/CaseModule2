@@ -6,19 +6,50 @@ import controller.ProductManager;
 import models.Customer;
 import models.OrderDetail;
 import models.Product;
+import storage.FileCustomer;
+import storage.FileProduct;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 public class ClientDemo {
+
     static final CustomerManager customerManager = CustomerManager.getINSTANCE();
     static final ProductManager productManager = ProductManager.getINSTANCE();
     static final CustomerService customerService = CustomerService.getINSTANCE();
-    public static void main(String[] args) {
-        mainMenu();
+    private static List<Customer> customerList = new ArrayList<>();
+    private static List<Product> productList = new ArrayList<>();
 
+    static {
+        try {
+            customerList = FileCustomer.getINSTANCE().readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static {
+        try {
+            productList = FileProduct.getINSTANCE().readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void main(String[] args) {
+        CustomerManager.setCustomerList(customerList);
+        ProductManager.setProductList(productList);
+        mainMenu();
+//        createOrderDetail();
     }
 
     public static void mainMenu(){
@@ -85,7 +116,8 @@ public class ClientDemo {
             System.out.println("Menu");
             System.out.println("1. Hiện thị danh sách sản phẩm");
             System.out.println("2. Đặt hàng");
-            System.out.println("3. Thanh toán");
+            System.out.println("3. Hiển thị hóa đơn");
+            System.out.println("4. Thanh toán hóa đơn");
             System.out.println("0. Quay lại menu");
             choose = Integer.parseInt(scanner.nextLine());
             switch (choose){
@@ -93,11 +125,13 @@ public class ClientDemo {
                     productManager.displayListProduct();
                     break;
                 case 2:
-                    customerService.Order();
+                    customerService.createNewOrderDetail();
                     break;
                 case 3:
-                    customerService.getAmount();
+                    customerService.displayInvoice();
                     break;
+                case 4:
+                    customerService.purchase();
                 case 0:
                     break;
                 default:
@@ -157,8 +191,8 @@ public class ClientDemo {
         }
     }
 
-    public static void createCustomer() {
-        try {
+    public static Customer createCustomer() {
+//        try {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Mời bạn nhập tên: ");
             String name = scanner.nextLine();
@@ -185,10 +219,11 @@ public class ClientDemo {
                 customerManager.addCustomer(customer);
                 System.out.println("Đã tạo mới thành công");
             }
-        } catch (InputMismatchException e) {
-            System.err.println("Bạn đã nhập sai thông tin ! Xin vui lòng nhập lại");
-            createCustomer();
-        }
+//        } catch (InputMismatchException e) {
+//            System.err.println("Bạn đã nhập sai thông tin ! Xin vui lòng nhập lại");
+//            createCustomer();
+//        }
+        return customer;
     }
 
 
@@ -337,4 +372,5 @@ public class ClientDemo {
             }
         }
     }
+
 }

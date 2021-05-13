@@ -4,10 +4,11 @@ import models.Customer;
 import storage.FileCustomer;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
 public class CustomerManager {
-    static FileCustomer fileCustomer = FileCustomer.getINSTANCE();
+    FileCustomer fileCustomer = FileCustomer.getINSTANCE();
 
     private static CustomerManager INSTANCE;
 
@@ -19,7 +20,7 @@ public class CustomerManager {
         return INSTANCE;
     }
 
-    private static List<Customer> customerList = new ArrayList<>();
+    public static List<Customer> customerList = new ArrayList<>();
 
 
     public boolean checkIdCustomer(Customer customer){
@@ -46,10 +47,8 @@ public class CustomerManager {
     public void addCustomer(Customer customer){
         customerList.add(customer);
         try {
-            fileCustomer.readFile();
+            fileCustomer.writeFile(customerList);
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

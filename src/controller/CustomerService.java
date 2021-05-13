@@ -1,5 +1,7 @@
 package controller;
 
+import models.Customer;
+import models.OrderDetail;
 import models.Product;
 
 import java.util.ArrayList;
@@ -7,7 +9,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CustomerService {
+    private static Scanner scanner = new Scanner(System.in);
     private static CustomerService INSTANCE;
+    private List<OrderDetail> listOrder = new ArrayList<>();
+
+    private List<Product> listProduct = new ArrayList<>();
 
     private CustomerService(){
 
@@ -16,43 +22,66 @@ public class CustomerService {
         if(INSTANCE == null) INSTANCE  = new CustomerService();
         return INSTANCE;
     }
+    public void addProductToOrderDetail(){
 
-    private List<Product> listOrder = new ArrayList<>();
-
-    public List Order(){
-        System.out.println("Mời bạn nhập mã sản phẩm: ");
-        Scanner scanner = new Scanner(System.in);
-        String productId = scanner.nextLine();
-        System.out.println("Mời bạn nhập số lượng muốn mua: ");
-        Scanner scanner1 = new Scanner(System.in);
-        int quantity = Integer.parseInt(scanner1.nextLine());
-        Product product;
-        for (Product p: ProductManager.getINSTANCE().getProductList()
+    }
+    public void createNewOrderDetail(){
+        OrderDetail orderDetail = new OrderDetail();
+        System.out.println("Mời bạn nhập id hóa đơn");
+        String orderId = scanner.nextLine();
+        orderDetail.setOrderId(orderId);
+        System.out.println("Nhập khách hàng theo id");
+        String id = scanner.nextLine();
+        for (Customer c: CustomerManager.customerList
              ) {
-            if(p.getProductID().equals(productId)){
-                product = p;
-//                product.setQuanity(quantity);
-                listOrder.add(product);
-            }
-            else {
-                System.out.println("Sản phẩm không tồn tại trong danh sách sản phẩm");
+            if(id.equals(c.getId())){
+                orderDetail.setCustomer(c);
             }
         }
-       return listOrder;
+        System.out.println("Mời nhập id sản phẩm");
+        String idProduct = scanner.nextLine();
+        System.out.println("Mời nhập số lượng");
+        int quanity = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < ProductManager.productList.size(); i++) {
+            if(ProductManager.productList.get(i).getProductID().equals(idProduct))
+
+                    listProduct.add(ProductManager.productList.get(i));
+            ProductManager.productList.get(i).setQuanity(ProductManager.productList.get(i).getQuanity()-quanity);
+        }
+        for (int i = 0; i < listProduct.size(); i++) {
+
+            if(listProduct.get(i).getProductID().equals(id)){
+                listProduct.get(i).setQuanity(quanity);
+            }
+        }
+        orderDetail.setPurchaseList(listProduct);
+        System.out.println("Mời bạn nhập ngày tạo hóa đơn");
+        String date = scanner.nextLine();
+        orderDetail.setInvoiceCreatedDate(date);
+        listOrder.add(orderDetail);
     }
 
-    public void getAmount(){
-        double totalPrice = 0;
+    public void purchase(){
+        double total = 0;
+        for (int i = 0; i < listProduct.size() ; i++) {
+            total += listProduct.get(i).getPrice()*listProduct.get(i).getQuanity();
+        }
+        System.out.println("Số tiền bạn phải thanh toán là: " + total);
+        listProduct.clear();
+    }
+    public void addOrder(OrderDetail orderDetail){
+        listOrder.add(orderDetail);
+    }
+
+    public void displayInvoice(){
         if(listOrder.isEmpty()){
-            System.out.println("Chưa có sản phẩm nào trong giỏ hàng của bạn");
+            System.out.println("Không có hóa đơn nào ");
         }
-        else {
-
-            for (int i = 0; i < listOrder.size(); i++) {
-                totalPrice += (listOrder.get(i).getPrice()*listOrder.get(i).getQuanity());
-            }
-            System.out.println("Số tiền bạn phải trả là " + totalPrice);
+        for (OrderDetail o:listOrder
+             ) {
+            System.out.println(o.toString());
         }
-        listOrder.clear();
     }
+
+
 }

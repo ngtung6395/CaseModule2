@@ -1,14 +1,18 @@
 package models;
 
-public class Product {
+import storage.FileProduct;
+
+import java.io.Serializable;
+
+public class Product implements Serializable {
     private String productName;
     private String productID;
     private String description;
     private int quanity;
     private double price;
 
-//    public Product() {
-//    }
+    public Product() {
+    }
 
     public Product(String productName, String productID, String description, int quanity, double price) {
         this.productName = productName;

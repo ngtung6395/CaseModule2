@@ -2,7 +2,9 @@ package controller;
 
 import models.Customer;
 import models.Product;
+import storage.FileProduct;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.Scanner;
 
 public class ProductManager {
     private static ProductManager INSTANCE;
+
 
     private ProductManager(){
 
@@ -19,18 +22,25 @@ public class ProductManager {
         return INSTANCE;
     }
 
-    private List<Product> productList = new ArrayList<>();
 
-    public ProductManager(List<Product> productList) {
-        this.productList = productList;
-    }
+    FileProduct fileProduct = FileProduct.getINSTANCE();
 
-    public List<Product> getProductList() {
+    public static List<Product> productList = new ArrayList<>();
+
+    public static List<Product> getProductList() {
+        FileProduct fileProduct = FileProduct.getINSTANCE();
+        try {
+            productList = fileProduct.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         return productList;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public static void setProductList(List<Product> productList) {
+        ProductManager.productList = productList;
     }
 
     public boolean checkIdProduct(Product product){
@@ -56,10 +66,20 @@ public class ProductManager {
 
     public void addProduct(Product product){
         productList.add(product);
+        try {
+            fileProduct.writeFile(productList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void removeProduct(Product product){
         productList.remove(product);
+        try {
+            fileProduct.writeFile(productList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Product findProductById(String id){
@@ -71,6 +91,5 @@ public class ProductManager {
         }
         return product;
     }
-
 
 }
